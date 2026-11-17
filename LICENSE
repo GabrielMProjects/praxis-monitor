@@ -1,0 +1,32 @@
+Copyright (c) 2026 GabrielMProjects. All rights reserved.
+
+PROPRIETARY - ALL RIGHTS RESERVED - NOT OPEN SOURCE
+
+This repository is publicly visible solely so that it can be viewed and
+evaluated (for example by recruiters and potential employers). Visibility is
+not a licence.
+
+This software, its source code, documentation, screenshots and all other
+materials in this repository (together, the "Software") are the exclusive
+property of the copyright holder. Except as stated below, no licence, express
+or implied, is granted. Without the prior written permission of the copyright
+holder you may not use, copy, modify, merge, publish, distribute, sublicense,
+sell, host or otherwise make available the Software or any part of it, use it
+commercially, or use it to train machine-learning models.
+
+Permitted without further permission:
+  - viewing and reading the Software for personal evaluation, and
+  - the rights that GitHub's Terms of Service grant to other GitHub users for
+    public repositories, namely viewing and forking the repository within the
+    GitHub platform.
+
+Previously granted and legally effective license rights remain unaffected.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IT IS A TECHNICAL DEMONSTRATION WITH SYNTHETIC DATA ONLY AND MUST NOT
+BE USED FOR REAL PATIENT CARE. THE COPYRIGHT HOLDER IS NOT LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE SOFTWARE.
+
+Third-party components (for example Spring Boot, Flutter and the packages
+listed in backend/pom.xml and frontend/pubspec.yaml) remain subject to their
+own licences.

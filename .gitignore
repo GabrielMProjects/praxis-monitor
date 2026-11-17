@@ -1,0 +1,36 @@
+﻿# ---- Build output, caches, dependencies
+target/
+build/
+.dart_tool/
+.pub-cache/
+.gradle/
+node_modules/
+coverage/
+*.class
+*.jar
+!backend/.mvn/wrapper/maven-wrapper.jar
+
+# ---- Local demo state (PID files, logs) and any logs / temp files
+.demo/
+*.pid
+*.log
+*.tmp
+*.bak
+*.swp
+
+# ---- IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ---- Secrets / local configuration (none are required; never commit them)
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.jks
+application-local.yml
+application-local.yaml

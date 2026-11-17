@@ -1,0 +1,11 @@
+﻿# Lokale Entwicklung. Aktivieren: SPRING_PROFILES_ACTIVE=dev  oder  --spring.profiles.active=dev
+praxis:
+  cors:
+    # Flutter-Web-Dev-Server nutzt zufaellige Ports; weiterhin nur lokale Hosts.
+    allowed-origin-patterns: "http://localhost:*,http://127.0.0.1:*,http://[::1]:*"
+  demo:
+    seed-patients: true   # synthetische Demo-Patienten beim Start
+
+logging:
+  level:
+    com.praxismonitor: DEBUG

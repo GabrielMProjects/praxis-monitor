@@ -1,0 +1,117 @@
+name: CI
+
+# Free GitHub-hosted runners only. No deployment, no secrets, read-only token.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch/PR cancels the outdated run.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.50.0"
+  JAVA_VERSION: "21"
+  NODE_VERSION: "24"
+
+jobs:
+  backend:
+    name: Backend (Java 21, Maven)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - name: Build and test (unit, service, REST, WebSocket integration)
+        working-directory: backend
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -ntp verify
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: backend-test-reports
+          path: backend/target/surefire-reports/
+          retention-days: 14
+
+  frontend:
+    name: Frontend (Flutter analyze, tests, web release build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Dependencies (locked by pubspec.lock)
+        working-directory: frontend
+        run: flutter pub get --enforce-lockfile
+      - name: Static analysis
+        working-directory: frontend
+        run: flutter analyze
+      - name: Unit, BLoC, repository, widget and architecture tests
+        working-directory: frontend
+        run: |
+          mkdir -p build
+          flutter test --file-reporter json:build/flutter-test-report.json
+      - name: Release build (web)
+        working-directory: frontend
+        run: flutter build web --release
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: flutter-test-report
+          path: frontend/build/flutter-test-report.json
+          retention-days: 14
+
+  e2e:
+    name: End-to-end (real backend + real Flutter UI in headless Chrome)
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Run data-stack E2E and browser E2E (backend/frontend start and stop by the tests themselves)
+        env:
+          CI: "true"
+          CHROME_BIN: google-chrome
+        run: bash scripts/e2e.sh
+      - name: Cleanup leftover processes
+        if: always()
+        run: |
+          pkill -f 'praxismonitor-.*\.jar' || true
+          pkill -f 'remote-debugging-port' || true

@@ -1,0 +1,21 @@
+# Basis-Konfiguration: sicherer lokaler Standard.
+# Development-Einstellungen: application-dev.yml (nur mit SPRING_PROFILES_ACTIVE=dev aktiv).
+spring:
+  application:
+    name: praxismonitor
+
+server:
+  port: 8080
+
+praxis:
+  # Erlaubte Browser-Origins (Muster) fuer REST (CORS) und WebSocket-Handshake.
+  # Standard: nur lokale Hosts. Keine pauschale Freigabe ("*").
+  cors:
+    allowed-origin-patterns: "http://localhost:*,http://127.0.0.1:*"
+  rooms:
+    count: 4
+  history:
+    # COMPLETED patients kept in memory (oldest evicted first)
+    max-completed-patients: 100
+  demo:
+    seed-patients: false
